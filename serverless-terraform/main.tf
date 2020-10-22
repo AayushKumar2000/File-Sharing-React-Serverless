@@ -25,8 +25,9 @@ module "s3-public-module" {
 module "lb-module" {
   source = "./lambda"
 
-  dynamodb_arn=module.dynamodb-module.dynamodb_table_arn
-  s3_bucket_arn=module.s3-public-module.s3-bucket_arn
+  dynamodb_arn= module.dynamodb-module.dynamodb_table_arn
+  s3_bucket_arn= module.s3-public-module.s3-bucket_arn
+  s3_bucket_id= module.s3-public-module.s3-bucket_id
 
 }
 

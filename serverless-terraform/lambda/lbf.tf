@@ -2,7 +2,7 @@
 
 variable "dynamodb_arn" { }
 variable "s3_bucket_arn" { }
-
+variable "s3_bucket_id" { }
 
   # lambda-function policy
 
@@ -41,7 +41,7 @@ resource "aws_iam_policy" "addTagS3_addObjectTagging" {
       {
           "Effect": "Allow",
           "Action": ["s3:PutObjectTagging"],
-          "Resource": "${var.s3_bucket_arn}"
+          "Resource": "${var.s3_bucket_arn}/*"
       }
   ]
 }
@@ -100,6 +100,32 @@ resource "aws_lambda_layer_version" "lambda_layer_xray-sdk" {
 
   compatible_runtimes = ["nodejs12.x"]
 }
+
+
+# to trigger addTags3 lambda fucntion when obkect is push to s3 bucket
+
+resource "aws_lambda_permission" "allow_S3" {
+  statement_id  = "AllowExecutionFromS3"
+  action        = "lambda:InvokeFunction"
+  function_name = module.function-addS3Tag.lambda_arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = var.s3_bucket_arn
+
+}
+
+resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
+bucket = var.s3_bucket_id
+lambda_function {
+lambda_function_arn = module.function-addS3Tag.lambda_arn
+events              = ["s3:ObjectCreated:Put"]
+}
+}
+
+
+
+
+
+
 
 #  lambda functions
 
