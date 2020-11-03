@@ -10,8 +10,9 @@ const DownloadContent=(props)=>{
   useEffect(()=>{
     var id=(props.match.params.fileid).split(':')[0];
 
-    axios.get(`${process.env.REACT_APP_DOWNLOAD_URL}/getfileDetails?fid=${id}`).then((res)=>{
-       if(res.data.data){
+    axios.get(`${process.env.REACT_APP_DOWNLOAD_URL}/getfileDetails?id=${id}`).then((res)=>{
+
+       if(Object.keys(res.data).length !== 0){
          setFileData(res.data);
 
        }else
@@ -29,12 +30,11 @@ const DownloadContent=(props)=>{
 
 
 
-
 const showFileList=()=>{
-console.log(fileList ,fileData.zipfiles);
- if(!fileList && fileData.zipfiles){
+console.log(fileList ,fileData.zipFileDetails);
+ if(!fileList && fileData.zipFileDetails.length>0){
 
-  const x=  fileData.zipfiles.map((element)=>{
+  const x=  fileData.zipFileDetails.map((element)=>{
        return(
 
          <li className="downloadFile__container__fileList-file">

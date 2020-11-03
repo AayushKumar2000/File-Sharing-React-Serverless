@@ -11,6 +11,9 @@ locals {
 
 
 resource "aws_iam_role" "api-gateway" {
+
+  count = local.dynamodb_integration  ? 1 : 0
+
   name = "${var.api_name}-api-gateway"
   description = "Managed by Terraform"
   assume_role_policy = <<EOF
@@ -35,7 +38,7 @@ resource "aws_iam_role_policy" "api-gateway-db" {
   count = local.dynamodb_integration  ? 1 : 0
 
   name = "DDBPolicy"
-  role = aws_iam_role.api-gateway.id
+  role = aws_iam_role.api-gateway[0].id
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -111,7 +114,8 @@ count =  length(var.api_resource_path)
   integration_http_method = "POST"
   type                    = var.api_integration_type[count.index]
   uri                     = var.integration_uri[count.index]
-  credentials = aws_iam_role.api-gateway.arn
+  credentials = var.api-method_integration[count.index] == "dynamodb" ? aws_iam_role.api-gateway[0].arn : null
+
 
   request_templates = {
    "application/json" = var.api-method_integration[count.index] == "lambda" ? "Empty" : var.request_template
@@ -158,6 +162,10 @@ resource "aws_api_gateway_method_response" "response_200" {
   http_method = aws_api_gateway_method.method[count.index].http_method
   status_code = "200"
 
+  response_parameters = {
+        "method.response.header.Access-Control-Allow-Origin" = true
+    }
+
 }
 
 
@@ -168,7 +176,9 @@ resource "aws_api_gateway_integration_response" "MyIntegrationResponse" {
   resource_id = aws_api_gateway_resource.resource[count.index].id
   http_method = aws_api_gateway_method.method[count.index].http_method
   status_code = aws_api_gateway_method_response.response_200[count.index].status_code
-
+  response_parameters = {
+        "method.response.header.Access-Control-Allow-Origin" = "'*'"
+    }
   response_templates = {
    "application/json" = var.api-method_integration[count.index] == "lambda" ? "Empty" : var.response_template
  }

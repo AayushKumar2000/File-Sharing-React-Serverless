@@ -140,23 +140,33 @@ function arrayBufferToBufferCycle(ab) {
   //   var newfile=new File([encrypted],file.name,{type: file.type,lastModified: file.lastModified});
 
      ////////////////////// saving zip file details to the dynamodb
-     axios.get(`${process.env.REACT_APP_UPLOAD_URL}/presignedurl?fileName=${fileName}&totalDownloads=${downloads}&fileSize=${totalSize}&expireValue=${expire}`).then((res)=>{
-       const url=res.data.fileUploadURL;
+     const filesDetails = {
+       fileName,
+       totalDownloads : downloads,
+       fileSize: totalSize,
+       totalSize,
+       expireValue: expire,
+       zipFileDetails : zipFiles.length!=0 ? zipFiles : []
+     }
 
-       getUploadingFile(fileName,totalSize,res.data.fileID);
-        zipFileID=res.data.fileID;
+     axios.post(`${process.env.REACT_APP_UPLOAD_URL}/zipfiledetails`,{...filesDetails}).then((res)=>{
+     //res.fileID
 
+      getUploadingFile(fileName,totalSize,res.data.fileID);
 
+      axios.get(`${process.env.REACT_APP_UPLOAD_URL}/presignedurl?fileID=${res.data.fileID}`).then((res)=>{
 
-      axios({method:"PUT",url:url,data:encrypted,onUploadProgress: function(progressEvent) {
-       var percentCompleted = Math.round( progressEvent.loaded / progressEvent.total  * 100);
+      if(res.data.fileUploadURL){
 
-          updateFileStatus(percentCompleted);
-         }}).then((res)=>{
-         console.log(res);
-         if(zipFiles.length!=0)
-          axios.post(`${process.env.REACT_APP_UPLOAD_URL}/zipfiledetails`,{data:zipFiles,id:zipFileID});
-       })
+        axios({method:"PUT",url:res.data.fileUploadURL,data:encrypted,onUploadProgress: function(progressEvent) {
+         var percentCompleted = Math.round( progressEvent.loaded / progressEvent.total  * 100);
+
+            updateFileStatus(percentCompleted);
+           }})
+       }
+
+      })
+
      })
 
     });
