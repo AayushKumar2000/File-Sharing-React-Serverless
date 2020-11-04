@@ -8,15 +8,13 @@
     "@testing-library/user-event": "^7.2.1",
     "axios": "^0.19.2",
     "buffer-to-arraybuffer": "0.0.5",
-    "crypto-js": "^4.0.0",
     "crypto-random-string": "^3.3.0",
     "jszip": "^3.2.2",
     "node-sass": "^4.14.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "^3.4.3",
-    "stream-buffers": "^3.0.2"
+    "react-scripts": "^3.4.3"
   },
   "scripts": {
     "start": "react-scripts start",

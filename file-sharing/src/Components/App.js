@@ -1,7 +1,8 @@
 import React from 'react';
 import MainComponent from './mainComponent';
 import DownloadComponent from './downloadContent';
-import {Route,BrowserRouter} from 'react-router-dom';
+import {Route,Router} from 'react-router-dom';
+import history from '../history';
 import './main.scss';
 
 
@@ -9,10 +10,10 @@ function App() {
 
   return (
   <div>
-    <BrowserRouter>
+    <Router history={history}>
      <Route path="/" exact component={MainComponent}/>
      <Route path="/download/:fileid" exact component={DownloadComponent}/>
-    </BrowserRouter>
+    </Router>
   </div>
   );
 }

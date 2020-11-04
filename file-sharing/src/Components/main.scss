@@ -255,6 +255,10 @@ html{
      font-size: 1.4rem;
      margin: 1rem 1.5rem;
      font-weight: 600;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     overflow: hidden;
+     width: 24rem;
     }
    &__item{
      background-color: #f2f2f2;
@@ -277,6 +281,10 @@ html{
        margin-bottom: .45rem;
        font-weight: 700;
        font-size: 1.55rem;
+       text-overflow: ellipsis;
+       white-space: nowrap;
+       overflow: hidden;
+       width: 24rem;
      }
      &-size{
       margin-left: .3rem;
@@ -401,6 +409,11 @@ html{
     &-name{
       font-weight: 600;
      letter-spacing: .04rem;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+     overflow: hidden;
+     width: 24rem;
+
     }
     &-size{
       font-size: 1.35rem;

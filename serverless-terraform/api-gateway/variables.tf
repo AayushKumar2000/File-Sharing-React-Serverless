@@ -9,6 +9,11 @@ variable "dynamodb_arn" {
   default = null
 }
 
+variable "enable_request_validator" {
+  default = false
+  type = bool
+}
+
 variable "model_name" {
   default = null
   type = string

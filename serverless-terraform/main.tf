@@ -99,7 +99,7 @@ module "api-gateway_module-fileDownload" {
   lambda_function_name =  module.lb-downloadFile.lambda_name
   dynamodb_arn = module.dynamodb-module.dynamodb_table_arn
 
-
+ enable_request_validator = true
   request_template = <<-EOT
    {
     "TableName":"file_details",
@@ -207,7 +207,7 @@ module "api-gateway_module-fileUpload" {
    }
   EOT
 
-
+ enable_request_validator = true
  create_request_model = true
  model_name = "requestValidation"
  method_request_validator_name = ["Empty","requestValidation"]
@@ -254,4 +254,18 @@ resource "null_resource" "react_env_file" {
     // working_dir="D:\\React\\New folder\\file-sharing"
 
   }
+}
+
+module "webhosting" {
+  source = "./s3-webhosting"
+
+  bucket-name = "file-sharing-application"
+  index-document ="index.html"
+  file-path = "../file-sharing/build"
+  upload-files = false
+
+}
+
+output "website-url" {
+  value = module.webhosting.website-endpoint
 }

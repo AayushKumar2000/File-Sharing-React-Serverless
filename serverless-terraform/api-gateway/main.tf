@@ -58,6 +58,16 @@ resource "aws_iam_role_policy" "api-gateway-db" {
 EOF
 }
 
+resource "aws_api_gateway_request_validator" "myrequestvalidator" {
+  count = var.enable_request_validator ? 1 : 0
+
+  name                        = "${var.api_name}-request-validator"
+  rest_api_id                 = aws_api_gateway_rest_api.api_gateway.id
+  validate_request_body       = true
+  validate_request_parameters = true
+}
+
+
 resource "aws_api_gateway_model" "MyDemoModel" {
   count = var.create_request_model ? 1 : 0
   rest_api_id  = aws_api_gateway_rest_api.api_gateway.id
@@ -101,6 +111,8 @@ resource "aws_api_gateway_method" "method" {
   request_models = {
     "application/json" = var.create_request_model? var.method_request_validator_name[count.index] : "Empty"
   }
+
+  request_validator_id = var.enable_request_validator ? aws_api_gateway_request_validator.myrequestvalidator[0].id : null
 
   depends_on = [aws_api_gateway_model.MyDemoModel]
 }
