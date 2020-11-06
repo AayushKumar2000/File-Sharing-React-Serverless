@@ -92,14 +92,16 @@ module "api-gateway_module-fileDownload" {
   api-method_integration = ["lambda","dynamodb"]
 
 
-  api_resource_path = ["presignedurl","getfileDetails"]
+  api_resource_path = ["presignedurl","getfiledetails"]
   api_integration_type = ["AWS_PROXY", "AWS"]
   api_http_method = ["GET","GET"]
   integration_uri = [ module.lb-downloadFile.lambda_invoke_arn,"arn:aws:apigateway:us-east-1:dynamodb:action/GetItem" ]
   lambda_function_name =  module.lb-downloadFile.lambda_name
   dynamodb_arn = module.dynamodb-module.dynamodb_table_arn
 
- enable_request_validator = true
+ enable_request_validator = [true,true]
+ validate_body = [false,false]
+ validate_request_parameters = [ true , true]
   request_template = <<-EOT
    {
     "TableName":"file_details",
@@ -154,7 +156,7 @@ module "api-gateway_module-fileUpload" {
   api-method_integration = ["lambda","dynamodb"]
 
 
-  api_resource_path = ["presignedurl","zipfiledetails"]
+  api_resource_path = ["presignedurl","filedetails"]
   api_integration_type = ["AWS_PROXY", "AWS"]
   api_http_method = ["GET","POST"]
   integration_uri = [ module.lb-uploadFile.lambda_invoke_arn,"arn:aws:apigateway:us-east-1:dynamodb:action/PutItem" ]
@@ -207,7 +209,9 @@ module "api-gateway_module-fileUpload" {
    }
   EOT
 
- enable_request_validator = true
+  enable_request_validator = [true,true]
+  validate_body = [false, true]
+ validate_request_parameters = [ true , false]
  create_request_model = true
  model_name = "requestValidation"
  method_request_validator_name = ["Empty","requestValidation"]
@@ -262,7 +266,7 @@ module "webhosting" {
   bucket-name = "file-sharing-application"
   index-document ="index.html"
   file-path = "../file-sharing/build"
-  upload-files = false
+  upload-files = true
 
 }
 

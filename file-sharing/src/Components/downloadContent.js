@@ -10,7 +10,7 @@ const DownloadContent=(props)=>{
   useEffect(()=>{
     var id=(props.match.params.fileid).split(':')[0];
 
-    axios.get(`${process.env.REACT_APP_DOWNLOAD_URL}/getfileDetails?id=${id}`).then((res)=>{
+    axios.get(`${process.env.REACT_APP_DOWNLOAD_URL}/getfiledetails?id=${id}`).then((res)=>{
 
        if(Object.keys(res.data).length !== 0){
          setFileData(res.data);

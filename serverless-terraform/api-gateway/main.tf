@@ -59,12 +59,12 @@ EOF
 }
 
 resource "aws_api_gateway_request_validator" "myrequestvalidator" {
-  count = var.enable_request_validator ? 1 : 0
+  count = length(var.enable_request_validator)
 
-  name                        = "${var.api_name}-request-validator"
+  name                        = "${var.api_resource_path[count.index]}-validator"
   rest_api_id                 = aws_api_gateway_rest_api.api_gateway.id
-  validate_request_body       = true
-  validate_request_parameters = true
+  validate_request_body       = var.validate_body[count.index]
+  validate_request_parameters = var.validate_request_parameters[count.index]
 }
 
 
@@ -112,7 +112,7 @@ resource "aws_api_gateway_method" "method" {
     "application/json" = var.create_request_model? var.method_request_validator_name[count.index] : "Empty"
   }
 
-  request_validator_id = var.enable_request_validator ? aws_api_gateway_request_validator.myrequestvalidator[0].id : null
+  request_validator_id = var.enable_request_validator[count.index] ?  aws_api_gateway_request_validator.myrequestvalidator[count.index].id : null
 
   depends_on = [aws_api_gateway_model.MyDemoModel]
 }
@@ -204,10 +204,22 @@ resource "aws_api_gateway_integration_response" "MyIntegrationResponse" {
 #api gate-way deployment
 resource "aws_api_gateway_deployment" "MyDemoDeployment" {
 
-
   depends_on = [aws_api_gateway_integration_response.MyIntegrationResponse]
 
  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
  stage_name  = var.api_deployment_stage_name
+
+ triggers = {
+   redeployment = sha1(join(",", list(
+     jsonencode(aws_api_gateway_integration.integration),
+     jsonencode(aws_api_gateway_resource.resource),
+     jsonencode(aws_api_gateway_method.method)
+
+   )))
+ }
+
+ lifecycle {
+   create_before_destroy = true
+ }
 
 }

@@ -10,8 +10,18 @@ variable "dynamodb_arn" {
 }
 
 variable "enable_request_validator" {
-  default = false
-  type = bool
+  default = []
+  type = list
+}
+
+variable "validate_body" {
+  default = []
+  type = list
+}
+
+variable "validate_request_parameters" {
+  default = []
+  type = list
 }
 
 variable "model_name" {

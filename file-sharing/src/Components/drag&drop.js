@@ -149,7 +149,7 @@ function arrayBufferToBufferCycle(ab) {
        zipFileDetails : zipFiles.length!=0 ? zipFiles : []
      }
 
-     axios.post(`${process.env.REACT_APP_UPLOAD_URL}/zipfiledetails`,{...filesDetails}).then((res)=>{
+     axios.post(`${process.env.REACT_APP_UPLOAD_URL}/filedetails`,{...filesDetails}).then((res)=>{
      //res.fileID
 
       getUploadingFile(fileName,totalSize,res.data.fileID);
