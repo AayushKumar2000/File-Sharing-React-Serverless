@@ -112,9 +112,31 @@ resource "aws_api_gateway_method" "method" {
     "application/json" = var.create_request_model? var.method_request_validator_name[count.index] : "Empty"
   }
 
+  request_parameters = length(var.request_parameters) !=0 ?  var.define_request_parameters[count.index] == true ? zipmap(var.request_parameters[count.index].parameter_list,var.request_parameters[count.index].parameter_value) : null : null
+
   request_validator_id = var.enable_request_validator[count.index] ?  aws_api_gateway_request_validator.myrequestvalidator[count.index].id : null
 
+
+
+
   depends_on = [aws_api_gateway_model.MyDemoModel]
+}
+
+
+resource "aws_api_gateway_method_settings" "method_settings" {
+  count = length(var.api_http_method)
+
+  rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
+  method_path = "${aws_api_gateway_resource.resource[count.index].path_part}/${aws_api_gateway_method.method[count.index].http_method}"
+  stage_name = var.api_deployment_stage_name
+
+
+    settings {
+      caching_enabled = var.enable_cache ? var.enable_cache_in_method[count.index] : null
+      cache_ttl_in_seconds = var.cache_ttl
+    }
+
+
 }
 
 resource "aws_api_gateway_integration" "integration" {
@@ -127,6 +149,7 @@ count =  length(var.api_resource_path)
   type                    = var.api_integration_type[count.index]
   uri                     = var.integration_uri[count.index]
   credentials = var.api-method_integration[count.index] == "dynamodb" ? aws_iam_role.api-gateway[0].arn : null
+  cache_key_parameters = length(var.cache_key_parameters) != 0 ? var.enable_cache_in_method[count.index] ? var.cache_key_parameters[count.index] : null : null
 
 
   request_templates = {
@@ -200,6 +223,16 @@ resource "aws_api_gateway_integration_response" "MyIntegrationResponse" {
 
 }
 
+resource "aws_api_gateway_stage" "test" {
+  stage_name    = var.api_deployment_stage_name
+  rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
+  deployment_id = aws_api_gateway_deployment.MyDemoDeployment.id
+
+  cache_cluster_enabled = var.enable_cache
+  cache_cluster_size = var.enable_cache ? var.cache_size : null
+}
+
+
 
 #api gate-way deployment
 resource "aws_api_gateway_deployment" "MyDemoDeployment" {
@@ -207,7 +240,7 @@ resource "aws_api_gateway_deployment" "MyDemoDeployment" {
   depends_on = [aws_api_gateway_integration_response.MyIntegrationResponse]
 
  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
- stage_name  = var.api_deployment_stage_name
+
 
  triggers = {
    redeployment = sha1(join(",", list(

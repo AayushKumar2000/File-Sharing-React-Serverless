@@ -21,7 +21,8 @@ variable "upload-files" {
 resource "aws_s3_bucket" "webhosting" {
   bucket = var.bucket-name
   acl    = "public-read"
-
+  force_destroy = true
+  
   website {
     index_document = var.index-document
     error_document = var.index-document

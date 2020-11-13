@@ -9,9 +9,44 @@ variable "dynamodb_arn" {
   default = null
 }
 
+variable "enable_cache" {
+  default = false
+  type = bool
+}
+
+variable "cache_size" {
+  default = 0.5
+  type = number
+}
+
+ variable "cache_key_parameters" {
+  default = []
+  type = list
+}
+
+variable "enable_cache_in_method" {
+  default = []
+  type = list
+}
+
+variable "cache_ttl" {
+  default = 300
+  type = number
+}
+
+
+ variable "define_request_parameters" {
+   default = []
+   type = list
+ }
 variable "enable_request_validator" {
   default = []
   type = list
+}
+
+variable "request_parameters" {
+  default = []
+  type = any
 }
 
 variable "validate_body" {

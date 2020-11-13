@@ -99,6 +99,26 @@ module "api-gateway_module-fileDownload" {
   lambda_function_name =  module.lb-downloadFile.lambda_name
   dynamodb_arn = module.dynamodb-module.dynamodb_table_arn
 
+ enable_cache = true
+ cache_size = 0.5
+ enable_cache_in_method = [false,true]
+ cache_ttl = 300
+ cache_key_parameters = [[],["method.request.querystring.fid"]]
+
+ define_request_parameters = [true,true]
+ request_parameters = [
+    {
+      resource_path = "presignedurl"
+      parameter_list = ["method.request.querystring.fid"]
+      parameter_value = ["true"]
+     },
+    {
+      resource_path = "getfiledetails"
+      parameter_list = ["method.request.querystring.fid"]
+      parameter_value = ["true"]
+    }
+ ]
+
  enable_request_validator = [true,true]
  validate_body = [false,false]
  validate_request_parameters = [ true , true]
@@ -209,6 +229,19 @@ module "api-gateway_module-fileUpload" {
    }
   EOT
 
+  enable_cache = false
+
+  define_request_parameters = [true,false]
+  request_parameters = [
+     {
+       resource_path = "presignedurl"
+       parameter_list = ["method.request.querystring.fid"]
+       parameter_value = ["true"]
+      },
+     { }
+  ]
+
+
   enable_request_validator = [true,true]
   validate_body = [false, true]
  validate_request_parameters = [ true , false]
@@ -266,7 +299,7 @@ module "webhosting" {
   bucket-name = "file-sharing-application"
   index-document ="index.html"
   file-path = "../file-sharing/build"
-  upload-files = true
+  upload-files = false
 
 }
 
